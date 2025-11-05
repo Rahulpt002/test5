@@ -11,6 +11,8 @@
     .card { border:1px solid #ddd; border-radius:8px; padding:1rem; }
     .price { font-weight: 700; margin: .5rem 0; }
     .btn { display:inline-block; padding:.5rem .75rem; background:#0a7; color:#fff; text-decoration:none; border-radius:6px; }
+    .badge { background:#c00; color:#fff; border-radius:10px; padding: 2px 6px; font-size: 12px; vertical-align: middle; margin-left: 6px; }
+    .fly { position: fixed; z-index: 9999; pointer-events:none; transition: transform .6s ease, opacity .6s ease; }
   </style>
 </head>
 <body>
@@ -19,6 +21,7 @@
     <div>
       {% if user.is_authenticated %}
         <a href="{% url 'profile' %}">My Profile</a> |
+        <a id="cart-link" href="{% url 'cart_view' %}">Cart <span id="cart-count" class="badge">{{ cart_count }}</span></a> |
         <a href="{% url 'logout' %}">Logout</a>
       {% else %}
         <a href="{% url 'login' %}">Login</a>
@@ -32,11 +35,69 @@
         <h3>{{ course.title }}</h3>
         <p>{{ course.description }}</p>
         <div class="price">{{ course.price_display }}</div>
-        <a class="btn" href="{% url 'buy_course' course.id %}">Buy</a>
+        {% if course.purchased %}
+          <span class="btn" style="background:#888; pointer-events:none;">Purchased</span>
+        {% else %}
+          <a class="btn" href="{% url 'buy_course' course.id %}">Buy</a>
+          {% if course.in_cart %}
+            <span class="btn" style="background:#555; pointer-events:none;">In Cart</span>
+          {% else %}
+            <a class="btn add-to-cart" data-course="{{ course.id }}" style="background:#06c" href="{% url 'add_to_cart' course.id %}">Add to Cart</a>
+          {% endif %}
+        {% endif %}
       </div>
-    {% empty %}
-      <p>No courses available.</p>
-    {% endfor %}
+
+<script>
+(function(){
+  function flyToCart(sourceEl){
+    var cart = document.getElementById('cart-link');
+    if(!cart || !sourceEl) return;
+    var r1 = sourceEl.getBoundingClientRect();
+    var fly = sourceEl.cloneNode(true);
+    fly.classList.add('fly');
+    fly.style.left = r1.left + 'px';
+    fly.style.top = r1.top + 'px';
+    fly.style.opacity = '0.9';
+    document.body.appendChild(fly);
+    var r2 = cart.getBoundingClientRect();
+    var dx = r2.left - r1.left;
+    var dy = r2.top - r1.top;
+    requestAnimationFrame(function(){
+      fly.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(0.2)';
+      fly.style.opacity = '0.1';
+    });
+    setTimeout(function(){ fly.remove(); }, 700);
+  }
+
+  function updateCartCount(n){
+    var el = document.getElementById('cart-count');
+    if(el){ el.textContent = n; }
+  }
+
+  function ajaxAdd(url, btn){
+    fetch(url, { headers: { 'X-Requested-With':'XMLHttpRequest', 'Accept':'application/json' }})
+      .then(r => r.json())
+      .then(data => {
+        if(data && data.ok){
+          flyToCart(btn);
+          updateCartCount(data.cart_count);
+          btn.outerHTML = '<span class="btn" style="background:#555; pointer-events:none;">In Cart</span>';
+        }
+      })
+      .catch(() => {});
+  }
+
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('a.add-to-cart');
+    if(!a) return;
+    e.preventDefault();
+    ajaxAdd(a.href, a);
+  });
+})();
+</script>
+  {% empty %}
+    <p>No courses available.</p>
+  {% endfor %}
   </div>
 </body>
 </html>

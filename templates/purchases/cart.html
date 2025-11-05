@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Your Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 2rem; }
+    .item { border-bottom: 1px solid #eee; padding: .75rem 0; display:flex; justify-content:space-between; gap:1rem; align-items:center; }
+    .total { font-weight: 700; margin-top: 1rem; }
+    .btn { display:inline-block; padding:.6rem 1rem; background:#0a7; color:#fff; border-radius:6px; text-decoration:none; }
+    .btn-danger { background:#c00; }
+  </style>
+</head>
+<body>
+  <h2>Your Cart</h2>
+  {% if items %}
+    {% for it in items %}
+      <div class="item">
+        <div style="flex:1;">
+          <div><strong>{{ it.title }}</strong></div>
+          <div>{{ it.description }}</div>
+          <div>{{ it.price_display }}</div>
+        </div>
+        <div>
+          <a class="btn btn-danger" href="{% url 'remove_from_cart' it.id %}">Remove</a>
+        </div>
+      </div>
+    {% endfor %}
+    <div class="total">Total: {{ total_display }}</div>
+    <p>
+      <a class="btn" href="{% url 'cart_checkout' %}">Proceed to Pay</a>
+      <a class="btn" style="background:#666" href="{% url 'course_list' %}">Continue Shopping</a>
+    </p>
+  {% else %}
+    <p>Your cart is empty.</p>
+    <p><a class="btn" href="{% url 'course_list' %}">Browse Courses</a></p>
+  {% endif %}
+</body>
+</html>
+
+

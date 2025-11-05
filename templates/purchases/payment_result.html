@@ -8,8 +8,13 @@
 </head>
 <body>
   {% if success %}
-    <h2 class="ok">Course purchased successfully.</h2>
-    <p>You now have access to {{ course.title }}.</p>
+    {% if already %}
+      <h2 class="ok">Course already purchased.</h2>
+      <p>You already have access to {{ course.title }}.</p>
+    {% else %}
+      <h2 class="ok">Course purchased successfully.</h2>
+      <p>You now have access to {{ course.title }}.</p>
+    {% endif %}
   {% else %}
     <h2 class="bad">Payment failed or invalid.</h2>
     <p>Please try again.</p>
