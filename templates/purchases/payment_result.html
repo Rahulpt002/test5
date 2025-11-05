@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Payment Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style> body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding:2rem; } a{color:#06c;} .ok{color:#0a7} .bad{color:#c00} </style>
+</head>
+<body>
+  {% if success %}
+    <h2 class="ok">Course purchased successfully.</h2>
+    <p>You now have access to {{ course.title }}.</p>
+  {% else %}
+    <h2 class="bad">Payment failed or invalid.</h2>
+    <p>Please try again.</p>
+  {% endif %}
+  <p><a href="{% url 'course_list' %}">Back to courses</a></p>
+</body>
+</html>
+
+

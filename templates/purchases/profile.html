@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>My Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 2rem; }
+    ul { padding-left: 1.25rem; }
+  </style>
+</head>
+<body>
+  <h2>Hello, {{ request.user.username }}</h2>
+  <p>Purchased courses:</p>
+  <ul>
+    {% for c in profile.purchased_courses.all %}
+      <li>{{ c.title }}</li>
+    {% empty %}
+      <li>No purchases yet.</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'course_list' %}">Back to courses</a></p>
+</body>
+</html>
+
+
